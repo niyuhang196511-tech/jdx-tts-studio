@@ -1,6 +1,38 @@
 # 测试与交付记录
 
-验证日期：2026-11-17。0.1.2 Linux 交付物已构建，并在 Ubuntu 26.04.1 x86_64 完成解包与启动检查。Windows 安装包和其他 Ubuntu 版本仍未验证。
+最近验证日期：2026-11-18。Windows x64 NSIS 安装包已通过完整 CMD 构建，安装与卸载尚未验证。2026-11-17 的 Linux 构建及启动记录保留如下，其他 Ubuntu 版本仍未验证。
+
+## 2026-11-18 Windows SH 构建入口
+
+新增 `scripts/build-windows.sh`，供 Windows Git Bash / MSYS2 执行 `sh scripts/build-windows.sh`。脚本定位项目目录，通过原生 `cmd.exe` 复用现有 CMD 构建流程并传递退出码。新增 `.gitattributes` 保持 SH 文件使用 LF，源码打包与交付审计同步包含这些文件。
+
+| 检查 | 结果 | 覆盖范围 |
+| --- | --- | --- |
+| Git Bash `sh -n` / `bash -n` | 通过 | 实际 SH 脚本语法 |
+| SH 入口隔离检查 | **11 个场景通过** | 使用真实 Git Bash 和原生 `cmd.exe`，仅构建 CMD 为替身；覆盖成功、失败码 17/59、外部目录、跨盘、中文/空格/`!` 路径、非空 CDPATH、平台检查和缺少 CMD |
+| Git Bash → CMD 原生工具检查 | 通过 | 找到 `uv`、`pnpm`、`cargo`，后端 `build-backend.py --check-only` 返回 Windows / Python 3.12.13 / FFmpeg 可用 |
+| 源码交付与换行规则 | 通过 | SH 和 `.gitattributes` 纳入交付要求，必需文件均存在，SH 实际无 CR；`git check-attr` 确认 LF；两个 Python 打包脚本语法检查通过 |
+
+证据见 `docs/verification/windows-sh-control-flow-2026-11-18.json`。本轮只修改构建入口、源码交付规则和说明，没有重新执行完整 NSIS 构建或应用测试；底层 CMD 完整构建及回归记录见下一节。平台拒绝分支和 MSYS 前缀使用 Git Bash 内的 `uname` 替身验证，未声称在实际 MSYS2、Linux 或 macOS 上验收。
+
+## 2026-11-18 Windows 打包修复
+
+将 Windows 构建入口从 PowerShell 改为 CMD，并更新源码交付审计。真实构建发现声音库组件 `VoiceLibrary.tsx` 与工具模块 `voiceLibrary.ts` 在 Windows 上解析冲突，已将组件改名为 `VoiceLibraryPanel.tsx` 并更新导入。
+
+| 检查 | 结果 | 覆盖范围 |
+| --- | --- | --- |
+| `scripts\build-windows.cmd` | **完整构建通过，退出码 0** | 锁定依赖、PyInstaller 后端冻结、图标、前端生产构建、MSVC release 编译及 NSIS |
+| `pnpm typecheck` / `pnpm build` | 通过 | Windows 上不再出现 TS1149/TS2305 文件名冲突；build 由 Tauri 构建入口执行 |
+| `pnpm test` | **20 项通过** | 3 个前端测试文件 |
+| `uv run --project backend pytest backend/tests -q` | **125 项通过** | 25.51 秒；1 条第三方 Starlette/httpx 弃用提醒 |
+| 冻结后端独立运行 | **7 项通过** | 独立环境、中文路径、动态端口握手、认证、音频导入、FFmpeg WAV 导出、父管道断开退出 |
+| CMD 控制流 | **11 个场景通过** | 使用隔离命令替身；验证成功返回、各阶段错误码、缺失工具、跨盘和特殊路径，不代表真实打包 |
+| 源码交付规则 | 通过 | 必需构建文件存在，选择 `.cmd`，不再选择 `.ps1`；未覆盖历史源码 ZIP 或 Linux 交付清单 |
+| Windows 安装 / 卸载 / 完整桌面生命周期 / 凭据持久化 | 未验证 | 构建和冻结后端检查不代替安装与桌面交互验收 |
+
+当前环境：Windows 11 x64（10.0.26200）、Python 3.12.13、Node.js 22.23.1、pnpm 11.18.0、Rust 1.98.0。安装包为 `src-tauri/target/release/bundle/nsis/Jdx TTS Studio_0.1.2_x64-setup.exe`，**277,241,879 字节**，SHA256 `e1c2f026c38a846ec90cedb4103a1a1bd36e7b7183c6ae2d8720e7de7a5c18ed`。
+
+证据见 `docs/verification/windows-build-2026-11-18.json` 和 `docs/verification/windows-cmd-control-flow-2026-11-18.json`。沙箱中的 uv 缓存写入及子进程检查受限，最终构建、回归和冻结后端基础检查均在沙箱外完成。代理冒烟检查在沙箱内超时，未计为通过；本轮未调用真实百炼付费接口，也未重跑 Playwright。
 
 ## 0.1.2 声音库、连接和时间轴迭代
 
@@ -20,7 +52,7 @@
 
 声音条目数、试听缓存和连接默认值细节见[声音库改进记录](VOICE_LIBRARY.md)；样音检查证据见 `docs/verification/official-preview-verification-0.1.2.json`。时间轴当前有多选、跨轨拖动、吸附、裁剪、分割、复制、静音、微调和线性淡入淡出；交叉淡化与自定义淡化曲线尚未实现。
 
-0.1.2 桌面启动和冻结后端证据见 `docs/verification/*0.1.2.json`。构建在 Ubuntu 26.04.1 使用项目内解包的 GTK/WebKit 依赖完成；AppImage 由 linuxdeploy/AppImageTool 封装。deb 只解包运行，没有进行系统安装。Windows 与 Ubuntu 22.04/24.04 尚未构建或验证。
+2026-11-17 的 0.1.2 桌面启动和冻结后端证据见 `docs/verification/*0.1.2.json`。构建在 Ubuntu 26.04.1 使用项目内解包的 GTK/WebKit 依赖完成；AppImage 由 linuxdeploy/AppImageTool 封装。deb 只解包运行，没有进行系统安装。当时尚未构建 Windows；2026-11-18 的 Windows 构建结果见本文首节，Ubuntu 22.04/24.04 仍未验证。
 
 0.1.2 交付文件为 `release/Jdx-TTS-Studio-0.1.2-linux-amd64.deb`、`release/Jdx-TTS-Studio-0.1.2-linux-amd64.AppImage` 和 `release/Jdx-TTS-Studio-0.1.2-source.zip`。`release/SHA256SUMS-0.1.2` 与 `release/desktop-delivery-manifest-0.1.2.json` 保存校验和、文件清单及验证边界。
 
@@ -58,7 +90,7 @@
 
 0.1.1 交付文件位于 `release/`：deb **126,325,920** 字节，AppImage **212,908,536** 字节，另附源码 ZIP。`SHA256SUMS-0.1.1` 记录三个交付文件的摘要；`desktop-delivery-manifest-0.1.1.json` 记录产物及证据索引。源码包含锁定依赖、构建脚本、测试与文档，排除运行数据、用户音频和会话凭据。安装包在当前 Ubuntu 26.04.1 主机验证；没有执行 deb 系统安装、Windows 安装或旧 Ubuntu 兼容性验收。
 
-## 环境
+## 2026-11-17 Linux 验证环境
 
 - Ubuntu 26.04.1 LTS，Linux x86_64。
 - Python 3.12.16 独立虚拟环境；Node.js 22.23.4，pnpm 12.18.0。
@@ -103,7 +135,7 @@ pytest 有一条第三方 Starlette TestClient 对 httpx 的弃用提醒，不�
 | --- | --- |
 | 真实百炼合成、声音克隆、音色设计、流式取消效果 | 未验证：未使用有效账户执行付费验收；协议测试不能证明账户权限或声音质量 |
 | 真实长文本、多角色、500 句连续云端生成 | 未验证：需要真实账户、配额及相应调用费用 |
-| Windows 安装包构建、安装、卸载、运行和凭据库持久化 | 未验证：当前是 Linux 环境；提供了 Windows 原生构建脚本 |
+| Windows 安装、卸载、完整桌面运行和凭据库持久化 | 未验证：2026-11-18 已完成 Windows 安装包构建和冻结后端检查，尚未执行安装及完整桌面交互验收 |
 | Ubuntu 22.04/24.04 干净环境安装 | 未验证：当前产物在 Ubuntu 26.04 构建；正式面向较旧发行版发布时必须在最低支持环境重建 |
 | `.deb` 系统安装与卸载 | 未执行系统安装：无免密管理员权限；最终 deb 解包目录下的实际布局启动及后端回收已通过 |
 | 原生保存对话框完整人工交互、可用系统钥匙环的跨重启持久化 | 未完成交互验收；原生相关逻辑和无钥匙环回退已有自动测试 |

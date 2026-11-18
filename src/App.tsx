@@ -98,7 +98,7 @@ import { Waveform } from "./Waveform";
 import { LiveAudioPlayer } from "./liveAudio";
 import { SetupWizard } from "./SetupWizard";
 import { ProjectLibrary } from "./ProjectLibrary";
-import { VoiceLibrary } from "./VoiceLibrary";
+import { VoiceLibraryPanel } from "./VoiceLibraryPanel";
 import { defaultConnection } from "./voiceLibrary";
 
 type Notice = { id: number; text: string; error: boolean };
@@ -1114,7 +1114,7 @@ export default function App() {
                   onRestored={value => { ui.setProject(value.id); setSearch(""); }}
                   onBusy={value => setBusy(value ? "project-management" : "")} notify={notify} />
               ) : ui.resource === "voices" ? (
-                <VoiceLibrary voices={bootstrap?.voices ?? []} models={bootstrap?.models ?? []}
+                <VoiceLibraryPanel voices={bootstrap?.voices ?? []} models={bootstrap?.models ?? []}
                   preferredModel={activeLine?.settings.model_id ?? preferredConnection?.model_id ?? "qwen-audio-3.1-tts-plus"}
                   currentRegion={(bootstrap?.connections.find(item => item.id === activeLine?.settings.connection_id) ?? preferredConnection)?.region}
                   currentVoice={activeLine?.settings.voice_id} favoriteIds={favoriteVoiceIds}

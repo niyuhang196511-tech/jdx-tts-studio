@@ -1,0 +1,86 @@
+{
+  "date": "2026-11-18",
+  "platform": "Windows 11 x64 (10.0.26200)",
+  "version": "0.1.2",
+  "environment": {
+    "node": "22.23.1",
+    "pnpm": "11.18.0",
+    "python": "3.12.13",
+    "rust": "1.98.0",
+    "rust_target": "x86_64-pc-windows-msvc",
+    "pyinstaller": "6.22.3"
+  },
+  "build": {
+    "command": "scripts\\build-windows.cmd",
+    "status": "passed",
+    "exit_code": 0,
+    "stages": [
+      "uv sync --project backend --group dev --locked",
+      "pnpm install --frozen-lockfile",
+      "backend\\.venv\\Scripts\\python.exe scripts\\build-backend.py",
+      "pnpm exec tauri icon src-tauri/icons/app-icon.svg",
+      "pnpm exec tauri build --bundles nsis"
+    ],
+    "installer": {
+      "path": "src-tauri/target/release/bundle/nsis/Jdx TTS Studio_0.1.2_x64-setup.exe",
+      "bytes": 277241879,
+      "sha256": "e1c2f026c38a846ec90cedb4103a1a1bd36e7b7183c6ae2d8720e7de7a5c18ed",
+      "webview2": "offlineInstaller"
+    }
+  },
+  "regression": {
+    "typecheck": {
+      "command": "pnpm typecheck",
+      "status": "passed"
+    },
+    "frontend_build": {
+      "command": "pnpm build",
+      "invoked_by": "Tauri beforeBuildCommand",
+      "status": "passed"
+    },
+    "frontend_tests": {
+      "command": "pnpm test",
+      "status": "passed",
+      "files": 3,
+      "tests": 20
+    },
+    "backend_tests": {
+      "command": "uv run --project backend pytest backend/tests -q",
+      "status": "passed",
+      "tests": 125,
+      "seconds": 25.51,
+      "warnings": 1,
+      "warning": "Third-party Starlette TestClient/httpx deprecation"
+    }
+  },
+  "frozen_runtime": {
+    "command": "backend\\.venv\\Scripts\\python.exe scripts\\smoke-runtime.py src-tauri\\resources\\backend\\jdx-backend.exe",
+    "status": "passed",
+    "executable_sha256": "123c237414a36eb1e7cba78cbc98f8532929838f4936ea6e2399ffb1157ea682",
+    "checks": [
+      "isolated environment",
+      "Chinese path",
+      "dynamic port handshake",
+      "authentication",
+      "audio import",
+      "FFmpeg WAV export",
+      "parent EOF shutdown"
+    ]
+  },
+  "cmd_control_flow_evidence": "docs/verification/windows-cmd-control-flow-2026-11-18.json",
+  "source_rules_audit": {
+    "status": "passed",
+    "required_build_files_present": true,
+    "windows_cmd_included": true,
+    "ps1_excluded": true,
+    "historical_archives_and_linux_manifest_rewritten": false
+  },
+  "limits": [
+    "No Windows installer installation or uninstallation test",
+    "No full Windows desktop UI lifecycle or Credential Manager persistence test",
+    "No real cloud synthesis, cloning or voice design; no billing calls",
+    "Playwright was not rerun",
+    "Sandbox uv cache writes and subprocess checks were restricted; successful build, regression and basic frozen-runtime checks ran outside the sandbox",
+    "Sandbox proxy smoke timed out and is not counted as passed"
+  ]
+}

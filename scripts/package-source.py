@@ -9,7 +9,7 @@ import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
 DIRECTORIES = ("src", "backend", "src-tauri", "scripts", "tests", "docs")
-ROOT_FILES = ("README.md", "AGENTS.md", ".gitignore", "package.json", "pnpm-lock.yaml", "pnpm-workspace.yaml",
+ROOT_FILES = ("README.md", "AGENTS.md", ".gitignore", ".gitattributes", "package.json", "pnpm-lock.yaml", "pnpm-workspace.yaml",
               "index.html", "vite.config.ts", "playwright.config.ts", "tsconfig.json", "tsconfig.app.json", "tsconfig.node.json")
 EXCLUDE_PARTS = {".venv", "__pycache__", ".pytest_cache", "target", "node_modules", "resources"}
 EXCLUDE_SUFFIXES = {".pyc", ".tsbuildinfo", ".log", ".appimage", ".deb", ".zip", ".wav", ".mp3", ".flac", ".ogg", ".m4a"}

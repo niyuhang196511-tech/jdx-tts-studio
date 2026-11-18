@@ -1,0 +1,164 @@
+{
+  "date": "2026-11-18",
+  "status": "passed",
+  "script": "scripts/build-windows.cmd",
+  "script_sha256": "fb106a3402df672d667ebefaa730a9abcdb7ce3ee828831b6986d8c803379131",
+  "verification_command": "backend\\.venv\\Scripts\\python.exe build\\verification\\verify-windows-cmd.py",
+  "test_kind": "Isolated CMD control-flow verification using command doubles; not a real Windows build",
+  "cloud_requests": 0,
+  "real_uv_pnpm_cargo_build_commands": 0,
+  "scenario_count": 11,
+  "scenarios": [
+    {
+      "name": "success-external-directory",
+      "status": "passed",
+      "exit_code": 0,
+      "executed_stages": [
+        "uv-sync",
+        "pnpm-install",
+        "backend-freeze",
+        "tauri-icon",
+        "tauri-build"
+      ],
+      "all_stages_used_fixture_project_directory": true,
+      "caller_directory_restored": true,
+      "cross_drive_call": false,
+      "unicode_spaces_and_exclamation_in_project_path": true
+    },
+    {
+      "name": "failure-uv-sync",
+      "status": "passed",
+      "exit_code": 17,
+      "executed_stages": [
+        "uv-sync"
+      ],
+      "all_stages_used_fixture_project_directory": true,
+      "caller_directory_restored": true,
+      "cross_drive_call": false,
+      "unicode_spaces_and_exclamation_in_project_path": true
+    },
+    {
+      "name": "failure-pnpm-install",
+      "status": "passed",
+      "exit_code": 23,
+      "executed_stages": [
+        "uv-sync",
+        "pnpm-install"
+      ],
+      "all_stages_used_fixture_project_directory": true,
+      "caller_directory_restored": true,
+      "cross_drive_call": false,
+      "unicode_spaces_and_exclamation_in_project_path": true
+    },
+    {
+      "name": "failure-backend-freeze",
+      "status": "passed",
+      "exit_code": 31,
+      "executed_stages": [
+        "uv-sync",
+        "pnpm-install",
+        "backend-freeze"
+      ],
+      "all_stages_used_fixture_project_directory": true,
+      "caller_directory_restored": true,
+      "cross_drive_call": false,
+      "unicode_spaces_and_exclamation_in_project_path": true
+    },
+    {
+      "name": "failure-tauri-icon",
+      "status": "passed",
+      "exit_code": 41,
+      "executed_stages": [
+        "uv-sync",
+        "pnpm-install",
+        "backend-freeze",
+        "tauri-icon"
+      ],
+      "all_stages_used_fixture_project_directory": true,
+      "caller_directory_restored": true,
+      "cross_drive_call": false,
+      "unicode_spaces_and_exclamation_in_project_path": true
+    },
+    {
+      "name": "failure-tauri-build",
+      "status": "passed",
+      "exit_code": 59,
+      "executed_stages": [
+        "uv-sync",
+        "pnpm-install",
+        "backend-freeze",
+        "tauri-icon",
+        "tauri-build"
+      ],
+      "all_stages_used_fixture_project_directory": true,
+      "caller_directory_restored": true,
+      "cross_drive_call": false,
+      "unicode_spaces_and_exclamation_in_project_path": true
+    },
+    {
+      "name": "missing-uv",
+      "status": "passed",
+      "exit_code": 1,
+      "executed_stages": [],
+      "all_stages_used_fixture_project_directory": true,
+      "caller_directory_restored": true,
+      "cross_drive_call": false,
+      "unicode_spaces_and_exclamation_in_project_path": true
+    },
+    {
+      "name": "missing-pnpm",
+      "status": "passed",
+      "exit_code": 1,
+      "executed_stages": [],
+      "all_stages_used_fixture_project_directory": true,
+      "caller_directory_restored": true,
+      "cross_drive_call": false,
+      "unicode_spaces_and_exclamation_in_project_path": true
+    },
+    {
+      "name": "missing-cargo",
+      "status": "passed",
+      "exit_code": 1,
+      "executed_stages": [],
+      "all_stages_used_fixture_project_directory": true,
+      "caller_directory_restored": true,
+      "cross_drive_call": false,
+      "unicode_spaces_and_exclamation_in_project_path": true
+    },
+    {
+      "name": "success-cross-drive",
+      "status": "passed",
+      "exit_code": 0,
+      "executed_stages": [
+        "uv-sync",
+        "pnpm-install",
+        "backend-freeze",
+        "tauri-icon",
+        "tauri-build"
+      ],
+      "all_stages_used_fixture_project_directory": true,
+      "caller_directory_restored": true,
+      "cross_drive_call": true,
+      "unicode_spaces_and_exclamation_in_project_path": true
+    },
+    {
+      "name": "failure-cross-drive",
+      "status": "passed",
+      "exit_code": 67,
+      "executed_stages": [
+        "uv-sync",
+        "pnpm-install"
+      ],
+      "all_stages_used_fixture_project_directory": true,
+      "caller_directory_restored": true,
+      "cross_drive_call": true,
+      "unicode_spaces_and_exclamation_in_project_path": true
+    }
+  ],
+  "limits": [
+    "uv, pnpm and cargo resolve only to fixture command doubles",
+    "The backend Python stage executes a fixture script that logs and returns a configured code",
+    "Does not validate dependency installation, PyInstaller output, Rust compilation or NSIS packaging",
+    "Temporary fixture directories are removed after verification"
+  ]
+}

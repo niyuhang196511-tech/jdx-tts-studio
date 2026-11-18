@@ -19,7 +19,21 @@ Linux x64 提供 deb 和 AppImage。正式发布应在最低支持的 Ubuntu 环
 
 ## 构建
 
-Linux 执行 `bash scripts/build-linux.sh`；Windows 执行 `powershell -ExecutionPolicy Bypass -File scripts/build-windows.ps1`。
+Linux 执行 `bash scripts/build-linux.sh`；Windows 在 CMD 中执行：
+
+```cmd
+scripts\build-windows.cmd
+```
+
+Windows 构建入口使用 CMD，无需 PowerShell 执行策略或 `.ps1` 脚本；也可从其他目录通过绝对路径调用。脚本检查 `uv`、`pnpm`、`cargo`，依次安装锁定依赖、冻结后端、生成图标并构建 NSIS 安装包；任一步失败立即退出并返回该步骤的错误码。安装包输出到 `src-tauri\target\release\bundle\nsis\`。
+
+Windows 的 Git Bash 或 MSYS2 可使用 SH 入口：
+
+```sh
+sh scripts/build-windows.sh
+```
+
+该入口自动定位项目目录，并转交同一份 CMD 构建流程，保留失败退出码。支持从其他目录调用及中文、空格路径；仓库通过 `.gitattributes` 保持 `.sh` 的 LF 换行。需要 Windows 原生的构建工具链；Linux、WSL 或 macOS 应在相应目标系统构建，不能通过此脚本交叉冻结 Windows 后端。
 
 可通过 `JDX_FFMPEG` 和 `JDX_FFPROBE` 指定 FFmpeg 与 FFprobe 的绝对路径。脚本在各自平台运行 PyInstaller `onedir`，将入口、`_internal`、音频工具和摘要清单整体复制进 Tauri 资源目录。禁止只分发 `jdx-backend` 入口文件，也不能将 Linux 冻结产物用于 Windows。
 
@@ -73,7 +87,15 @@ uv run --project backend python scripts/smoke-proxy-runtime.py src-tauri/resourc
 
 Linux deb、AppImage 和源码 ZIP 位于 `release/`。应用在 Ubuntu 26.04.1 x86_64 构建；当前主机使用项目内解包的开发依赖，没有安装系统开发包。AppImage 默认启动与 `--appimage-extract-and-run` 均通过中文临时数据目录、后端自动启动、动态 loopback 端口认证和关闭回收检查。deb 经解包后执行同一检查，没有安装到系统。
 
-0.1.2 的冻结后端、代理和桌面运行证据保存在 `docs/verification/`。Windows 安装包、Ubuntu 22.04/24.04 兼容性及干净系统安装仍待目标环境验证；真实百炼付费接口未在构建或 UI 测试中调用。
+2026-11-17 的 0.1.2 Linux 冻结后端、代理和桌面运行证据保存在 `docs/verification/`；当时尚未构建 Windows 安装包。Ubuntu 22.04/24.04 兼容性及干净系统安装仍待目标环境验证；真实百炼付费接口未在构建或 UI 测试中调用。Windows 后续构建结果见下节。
+
+### Windows CMD 构建修复（2026-11-18）
+
+Windows 入口改为 `scripts\build-windows.cmd`，源码交付审计同步要求该文件。声音库组件改名为 `VoiceLibraryPanel.tsx`，解决 Windows 不区分大小写的文件系统上，原 `VoiceLibrary.tsx` 与 `voiceLibrary.ts` 导致的 TypeScript 模块解析冲突。
+
+在 Windows 11 x64、Node.js 22.23.1、pnpm 11.18.0、Python 3.12.13、Rust 1.98.0 环境执行完整 CMD 构建成功，生成 `src-tauri\target\release\bundle\nsis\Jdx TTS Studio_0.1.2_x64-setup.exe`（277,241,879 字节，含 WebView2 离线安装程序）。冻结后端独立启动、中文数据路径、认证、音频导入、FFmpeg WAV 导出与父管道断开退出检查通过。证据见 `docs/verification/windows-build-2026-11-18.json`。
+
+CMD 控制流另有 11 个隔离命令替身场景，覆盖每个阶段失败退出、工具缺失、跨盘和中文/空格/`!` 路径；该检查不代替真实构建。Windows 安装、卸载、完整桌面生命周期及 Credential Manager 跨重启持久化尚未验证，本轮未调用真实百炼付费接口。
 
 ## 官方实现依据
 

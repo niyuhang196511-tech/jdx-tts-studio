@@ -2,7 +2,7 @@
 
 面向视频后期的中文桌面配音工作站。使用阿里云百炼远程语音模型，在本地管理项目、生成历史、时间轴、视频和导出文件。无需本地模型、CUDA 或 NVIDIA 显卡。
 
-当前版本为 **0.1.2**，提供 Linux deb、AppImage 和源码包。0.1.2 改进声音查找与试听、默认连接和时间轴操作；Windows 安装包尚未构建。功能实现与实际测试状态分别记录在 [测试报告](docs/TEST_REPORT.md)。真实云端合成需要用户自己的百炼账户和 API Key。
+当前版本为 **0.1.2**，提供 Linux deb、AppImage 和源码包。0.1.2 改进声音查找与试听、默认连接和时间轴操作；Windows x64 NSIS 安装包已于 2026-11-18 构建，安装与卸载尚未验收。功能实现与实际测试状态分别记录在 [测试报告](docs/TEST_REPORT.md)。真实云端合成需要用户自己的百炼账户和 API Key。
 
 ![工作台界面验收](docs/screenshots/workbench.png)
 
@@ -36,8 +36,14 @@ bash scripts/build-linux.sh
 
 Windows：
 
-```powershell
-powershell -ExecutionPolicy Bypass -File scripts/build-windows.ps1
+```cmd
+scripts\build-windows.cmd
+```
+
+Windows 的 Git Bash 或 MSYS2 也可执行：
+
+```sh
+sh scripts/build-windows.sh
 ```
 
 必须分别在目标操作系统构建。安装版包含完整 Python 运行目录和 FFmpeg，最终用户无需安装开发工具或手动运行 FastAPI。

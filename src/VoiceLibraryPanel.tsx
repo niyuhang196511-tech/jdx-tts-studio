@@ -27,7 +27,7 @@ type Props = {
   notify: (message: string, error?: boolean) => void;
 };
 
-export function VoiceLibrary(props: Props) {
+export function VoiceLibraryPanel(props: Props) {
   const [query, setQuery] = useState("");
   const [model, setModel] = useState("");
   const [gender, setGender] = useState("");

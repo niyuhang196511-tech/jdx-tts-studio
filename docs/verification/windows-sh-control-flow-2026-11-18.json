@@ -1,0 +1,141 @@
+{
+  "date": "2026-11-18",
+  "status": "passed",
+  "script": "scripts/build-windows.sh",
+  "script_sha256": "e50b37d5b02452e0b7152cd4b7b24e1bea588bda46bae171ee1dcb4aae22410a",
+  "verification_command": "backend\\.venv\\Scripts\\python.exe build\\verification\\verify-windows-sh.py",
+  "test_kind": "Actual Windows SH wrapper, real Git Bash and native cmd.exe; fixture build-windows.cmd only",
+  "bash": "D:\\Git\\bin\\bash.exe",
+  "uname": "MINGW64_NT-10.0-26200",
+  "scenario_count": 11,
+  "scenarios": [
+    {
+      "name": "sh-syntax",
+      "status": "passed",
+      "exit_code": 0
+    },
+    {
+      "name": "bash-syntax",
+      "status": "passed",
+      "exit_code": 0
+    },
+    {
+      "name": "sh-external-directory-success",
+      "status": "passed",
+      "exit_code": 0,
+      "interpreter": "sh",
+      "real_native_cmd_executed_fixture": true,
+      "cross_drive_caller": false,
+      "unicode_spaces_exclamation_in_project_path": true,
+      "ambient_cdpath_nonempty": true,
+      "fake_uname": null,
+      "windows_system32_removed_from_path": false
+    },
+    {
+      "name": "sh-external-directory-failure17",
+      "status": "passed",
+      "exit_code": 17,
+      "interpreter": "sh",
+      "real_native_cmd_executed_fixture": true,
+      "cross_drive_caller": false,
+      "unicode_spaces_exclamation_in_project_path": true,
+      "ambient_cdpath_nonempty": true,
+      "fake_uname": null,
+      "windows_system32_removed_from_path": false
+    },
+    {
+      "name": "bash-external-directory-failure59",
+      "status": "passed",
+      "exit_code": 59,
+      "interpreter": "bash",
+      "real_native_cmd_executed_fixture": true,
+      "cross_drive_caller": false,
+      "unicode_spaces_exclamation_in_project_path": true,
+      "ambient_cdpath_nonempty": true,
+      "fake_uname": null,
+      "windows_system32_removed_from_path": false
+    },
+    {
+      "name": "sh-cross-drive-success",
+      "status": "passed",
+      "exit_code": 0,
+      "interpreter": "sh",
+      "real_native_cmd_executed_fixture": true,
+      "cross_drive_caller": true,
+      "unicode_spaces_exclamation_in_project_path": true,
+      "ambient_cdpath_nonempty": true,
+      "fake_uname": null,
+      "windows_system32_removed_from_path": false
+    },
+    {
+      "name": "sh-cross-drive-failure59",
+      "status": "passed",
+      "exit_code": 59,
+      "interpreter": "sh",
+      "real_native_cmd_executed_fixture": true,
+      "cross_drive_caller": true,
+      "unicode_spaces_exclamation_in_project_path": true,
+      "ambient_cdpath_nonempty": true,
+      "fake_uname": null,
+      "windows_system32_removed_from_path": false
+    },
+    {
+      "name": "reject-linux",
+      "status": "passed",
+      "exit_code": 1,
+      "interpreter": "sh",
+      "real_native_cmd_executed_fixture": false,
+      "cross_drive_caller": false,
+      "unicode_spaces_exclamation_in_project_path": true,
+      "ambient_cdpath_nonempty": true,
+      "fake_uname": "Linux",
+      "windows_system32_removed_from_path": false
+    },
+    {
+      "name": "reject-darwin",
+      "status": "passed",
+      "exit_code": 1,
+      "interpreter": "sh",
+      "real_native_cmd_executed_fixture": false,
+      "cross_drive_caller": false,
+      "unicode_spaces_exclamation_in_project_path": true,
+      "ambient_cdpath_nonempty": true,
+      "fake_uname": "Darwin",
+      "windows_system32_removed_from_path": false
+    },
+    {
+      "name": "accept-msys-platform",
+      "status": "passed",
+      "exit_code": 0,
+      "interpreter": "sh",
+      "real_native_cmd_executed_fixture": true,
+      "cross_drive_caller": false,
+      "unicode_spaces_exclamation_in_project_path": true,
+      "ambient_cdpath_nonempty": true,
+      "fake_uname": "MSYS_NT-10.0-26200",
+      "windows_system32_removed_from_path": false
+    },
+    {
+      "name": "missing-native-cmd",
+      "status": "passed",
+      "exit_code": 1,
+      "interpreter": "sh",
+      "real_native_cmd_executed_fixture": false,
+      "cross_drive_caller": false,
+      "unicode_spaces_exclamation_in_project_path": true,
+      "ambient_cdpath_nonempty": true,
+      "fake_uname": "MINGW64_NT-10.0-26200",
+      "windows_system32_removed_from_path": true
+    }
+  ],
+  "cloud_requests": 0,
+  "real_builds": 0,
+  "limits": [
+    "The SH wrapper is copied unchanged into an isolated project with Unicode, spaces and ! in its path",
+    "Native cmd.exe is not mocked: successful fixture execution verifies /d /c and call arguments survive MSYS conversion",
+    "Only build-windows.cmd is a harmless fixture that records cwd and returns a configured exit code",
+    "Does not rerun uv, pnpm, PyInstaller, Rust or NSIS packaging",
+    "Non-Windows platform checks use fake uname output within Git Bash, not actual Linux or macOS",
+    "Temporary fixture directories are removed after verification"
+  ]
+}
