@@ -1,0 +1,1 @@
+{"status": "passed", "runtime": "/home/niyuhang/workspace/jdx-tts-studio/src-tauri/target/release/bundle/appimage/Jdx TTS Studio.AppDir/usr/lib/Jdx TTS Studio/backend/jdx-backend", "checks": ["isolated environment", "Chinese path", "dynamic port handshake", "authentication", "audio import", "FFmpeg WAV export", "parent EOF shutdown"]}

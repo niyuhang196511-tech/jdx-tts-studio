@@ -1,0 +1,64 @@
+import { expect, test } from "@playwright/test";
+
+test("connection uses a service URL, named voices and a persistent default", async ({ page, request }) => {
+  const session = await (await request.get("/__dev/session")).json() as { base_url: string; token: string };
+  const api = session.base_url + "/api/v1";
+  const headers = { Authorization: `Bearer ${session.token}` };
+  const previous = await (await request.get(api + "/bootstrap", { headers })).json();
+  const previousDefault = previous.preferences.default_connection_id ?? null;
+  let savedId: string | undefined;
+  const name = `地址与默认连接验收 ${Date.now()}`;
+  try {
+    await page.goto("/");
+    const skip = page.getByRole("button", { name: "稍后配置，进入工作台", exact: true });
+    if (await skip.waitFor({ state: "visible", timeout: 1500 }).then(() => true).catch(() => false)) await skip.click();
+    await page.getByRole("button", { name: "云端模型设置", exact: true }).click();
+    await page.getByRole("button", { name: "添加连接", exact: true }).click();
+    await expect(page.getByLabel("业务空间 ID", { exact: true })).toHaveCount(0);
+    await expect(page.getByLabel("服务地域", { exact: true })).toHaveCount(0);
+    await expect(page.getByLabel("默认音色 ID", { exact: true })).toHaveCount(0);
+    await page.getByLabel("连接名称", { exact: true }).fill(name);
+    await page.getByLabel("服务地址（Base URL）", { exact: true }).fill("http://invalid.example");
+    await page.getByRole("button", { name: "保存连接", exact: true }).click();
+    await expect(page.getByRole("alert")).toContainText("HTTPS 服务根地址");
+    await page.getByLabel("服务地址（Base URL）", { exact: true }).fill("https://ui-connection-probe.cn-beijing.maas.aliyuncs.com/");
+    await page.getByLabel("默认模型", { exact: true }).selectOption("qwen-audio-3.1-tts-flash");
+    const voice = page.getByLabel("默认音色", { exact: true });
+    await expect(voice.locator("option")).not.toHaveCount(0);
+    const options = await voice.locator("option").allTextContents();
+    expect(options.some(text => text.includes("龙") || text.includes("许"))).toBe(true);
+    await expect(voice).not.toHaveValue("");
+    const makeDefault = page.getByRole("checkbox", { name: /设为默认连接/ });
+    if (!(await makeDefault.isChecked())) await makeDefault.check();
+    const response = page.waitForResponse(value => value.url().endsWith("/api/v1/connections") && value.request().method() === "POST");
+    await page.getByRole("button", { name: "保存连接", exact: true }).click();
+    const savedResponse = await response;
+    const sent = savedResponse.request().postDataJSON();
+    expect(sent.workspace_id).toBeUndefined();
+    expect(sent.region).toBeUndefined();
+    expect(sent.api_key).toBeUndefined();
+    const saved = await savedResponse.json();
+    savedId = saved.id;
+    expect(savedResponse.ok()).toBe(true);
+    expect(saved.base_url).toBe("https://ui-connection-probe.cn-beijing.maas.aliyuncs.com");
+    await expect(page.getByRole("checkbox", { name: /正在使用的默认连接/ })).toBeChecked();
+    await expect.poll(async () => (await (await request.get(api + "/bootstrap", { headers })).json()).preferences.default_connection_id).toBe(savedId);
+    await page.getByRole("dialog").getByRole("button", { name: "关闭", exact: true }).click();
+    await page.reload();
+    await page.getByRole("button", { name: "云端模型设置", exact: true }).click();
+    await expect(page.getByLabel("连接名称", { exact: true })).toHaveValue(name);
+    await expect(page.getByLabel("默认模型", { exact: true })).toHaveValue("qwen-audio-3.1-tts-flash");
+    await page.screenshot({ path: "test-results/connection-settings.png", fullPage: true });
+    await page.getByLabel("连接名称", { exact: true }).fill(name + " 未保存");
+    await expect(page.getByRole("button", { name: "检测连接", exact: true })).toBeDisabled();
+    page.once("dialog", dialog => dialog.dismiss());
+    await page.getByRole("dialog").getByRole("button", { name: "关闭", exact: true }).click();
+    await expect(page.getByLabel("连接名称", { exact: true })).toHaveValue(name + " 未保存");
+    page.once("dialog", dialog => dialog.accept());
+    await page.getByRole("dialog").getByRole("button", { name: "关闭", exact: true }).click();
+    await expect(page.getByRole("dialog")).toHaveCount(0);
+  } finally {
+    if (savedId) await request.delete(`${api}/connections/${savedId}`, { headers });
+    await request.patch(api + "/preferences", { headers, data: { default_connection_id: previousDefault } });
+  }
+});

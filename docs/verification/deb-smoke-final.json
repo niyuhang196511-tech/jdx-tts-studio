@@ -1,0 +1,9 @@
+{
+  "package": "deb",
+  "extracted_layout_launch": true,
+  "desktop_alive": true,
+  "backend_ready": true,
+  "backend_pid": 300010,
+  "backend_stopped_after_parent_exit": true,
+  "log": ""
+}

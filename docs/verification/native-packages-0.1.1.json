@@ -1,0 +1,44 @@
+{
+  "version": "0.1.1",
+  "platform": "Ubuntu 26.04.1 LTS x86_64",
+  "packages": [
+    {
+      "path": "/home/niyuhang/workspace/jdx-tts-studio/release/Jdx-TTS-Studio-0.1.1-linux-amd64.deb",
+      "bytes": 126325920,
+      "sha256": "330ea946709cf200ec7996889b630b9094649cd0dbce3c55f5aaf36e94ac0ddf"
+    },
+    {
+      "path": "/home/niyuhang/workspace/jdx-tts-studio/release/Jdx-TTS-Studio-0.1.1-linux-amd64.AppImage",
+      "bytes": 212908536,
+      "sha256": "22ef8b5a1a7b00edcc15df2ce9fdbba49bff2e1980d3ebbb3c749b52124a8bc8"
+    }
+  ],
+  "verification": [
+    "docs/verification/runtime-smoke-0.1.1.json",
+    "docs/verification/proxy-runtime-smoke-0.1.1.json",
+    "docs/verification/deb-runtime-smoke-0.1.1.json",
+    "docs/verification/deb-proxy-runtime-smoke-0.1.1.json",
+    "docs/verification/desktop-smoke-0.1.1.json",
+    "docs/verification/appimage-runtime-smoke-0.1.1.json",
+    "docs/verification/appimage-proxy-runtime-smoke-0.1.1.json",
+    "docs/verification/appimage-desktop-smoke-0.1.1.json",
+    "docs/verification/appimage-default-smoke-0.1.1.json"
+  ],
+  "limits": [
+    "No real cloud requests or billing",
+    "No Windows build or runtime test",
+    "No clean Ubuntu 22.04/24.04 installation test",
+    "deb runtime tested after extraction; package not installed into system"
+  ],
+  "build_logs": [
+    "build/cargo-check-0.1.1.log",
+    "build/cargo-test-0.1.1.log",
+    "build/freeze-0.1.1.log",
+    "build/tauri-deb-0.1.1.log",
+    "build/appimage-0.1.1.log"
+  ],
+  "appimage_launch_modes": [
+    "default",
+    "--appimage-extract-and-run"
+  ]
+}
